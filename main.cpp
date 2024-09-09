@@ -6,8 +6,8 @@
 #include <tuple>
 #include <vector>
 
-const double MUTATION_RATE = 3;        // 3%
-const double CROSSOVER_RATE = 80;      // 80%
+const double MUTATION_RATE = 3;        // Taxa de mutação de 3%
+const double CROSSOVER_RATE = 80;      // Taxa de crossover de 80%
 const unsigned POPULATION_SIZE = 20;   // 20 indivíduos
 const unsigned MAX_GENERATIONS = 1000; // 1000 gerações
 const unsigned MAX_RUNS = 50;          // 50 execuções
@@ -16,7 +16,7 @@ using namespace std;
 using Queens = vector<bitset<3>>; // 3 bits para representar 8 rainhas
 
 // Gera um número aleatório entre a e b
-unsigned urand(unsigned, unsigned);
+unsigned roll(unsigned, unsigned);
 
 // Preenche o vetor de rainhas com números aleatórios
 void populate(Queens &queens);
@@ -101,7 +101,7 @@ int main()
     cout << "Results" << endl;
     cout << "===========================================" << endl;
 
-    for (auto i = 0; i < MAX_RUNS; ++i)
+    for (auto i = 0U; i < MAX_RUNS; ++i)
     {
         cout << "Run: " << i + 1 << " -> ";
         cout << "Fitness: " << fitness(best_queens[i]) << ", ";
@@ -119,7 +119,7 @@ int main()
 
     sort_population(best_queens); // Ordena as melhores rainhas
 
-    for (auto i = 0; i < 5; ++i)
+    for (auto i = 0U; i < 5; ++i)
     {
         cout << "Fitness: " << fitness(best_queens[i]) << endl;
         cout << "Queens: ";
@@ -134,7 +134,7 @@ int main()
     return EXIT_SUCCESS;
 }
 
-unsigned urand(unsigned a, unsigned b)
+unsigned roll(unsigned a, unsigned b)
 {
     static random_device rd;
     static mt19937 gen(rd());
@@ -145,16 +145,16 @@ unsigned urand(unsigned a, unsigned b)
 
 void populate(Queens &queens)
 {
-    for (unsigned i = 0; i < 8; ++i)
+    for (auto i = 0U; i < 8; ++i)
     {
-        queens[i] = urand(0, 7);
+        queens[i] = roll(0, 7);
     }
 }
 
 tuple<unsigned, unsigned> select_parents(const vector<Queens> &population)
 {
-    unsigned parent1 = roll_fitness(population);
-    unsigned parent2 = roll_fitness(population);
+    auto parent1 = roll_fitness(population);
+    auto parent2 = roll_fitness(population);
 
     while (parent1 == parent2)
     {
@@ -166,15 +166,15 @@ tuple<unsigned, unsigned> select_parents(const vector<Queens> &population)
 
 unsigned fitness(const Queens &queens)
 {
-    unsigned fitness = 0;
+    auto fitness = 0U;
 
-    for (unsigned i = 0; i < 8; ++i)
+    for (auto i = 0U; i < 8; ++i)
     {
-        for (unsigned j = i + 1; j < 8; ++j)
+        for (auto j = i + 1; j < 8; ++j)
         {
-            long diff = j - i;
-            long diff2 = queens[i].to_ulong() - queens[j].to_ulong();
-            if (queens[i] == queens[j] || abs(diff) == abs(diff2))
+            auto diff = j - i;
+            auto diff2 = queens[i].to_ulong() - queens[j].to_ulong();
+            if (queens[i] == queens[j] || abs((long)diff) == abs((long)diff2))
             {
                 ++fitness;
             }
@@ -189,15 +189,15 @@ tuple<Queens, Queens> crossover(const Queens &parent1, const Queens &parent2)
     Queens child1(8);
     Queens child2(8);
 
-    unsigned crossover_point = urand(0, 7);
+    auto crossover_point = roll(0, 7);
 
-    for (unsigned i = 0; i < crossover_point; ++i)
+    for (auto i = 0U; i < crossover_point; ++i)
     {
         child1[i] = parent1[i];
         child2[i] = parent2[i];
     }
 
-    for (unsigned i = crossover_point; i < 8; ++i)
+    for (auto i = crossover_point; i < 8; ++i)
     {
         child1[i] = parent2[i];
         child2[i] = parent1[i];
@@ -208,28 +208,28 @@ tuple<Queens, Queens> crossover(const Queens &parent1, const Queens &parent2)
 
 void mutate(Queens &queens)
 {
-    auto n = urand(0, 7); // Seleciona uma rainha aleatória
-    auto i = urand(0, 2); // Seleciona um bit aleatório
+    auto n = roll(0, 7); // Seleciona uma rainha aleatória
+    auto i = roll(0, 2); // Seleciona um bit aleatório
 
     queens[n].flip(i);
 }
 
 unsigned roll_fitness(const vector<Queens> &population)
 {
-    unsigned total_fitness = 0;
+    auto total_fitness = 0U;
 
     for (const auto &queens : population)
     {
         total_fitness += fitness(queens); // Soma o fitness de todas as rainhas
     }
 
-    unsigned roll = urand(0, total_fitness - 1);
+    auto roll_value = roll(0, total_fitness - 1);
 
-    unsigned sum = 0;
-    for (unsigned i = 0; i < POPULATION_SIZE; ++i)
+    auto sum = 0U;
+    for (auto i = 0U; i < POPULATION_SIZE; ++i)
     {
         sum += fitness(population[i]);
-        if (sum >= roll)
+        if (sum >= roll_value)
         {
             return i;
         }
@@ -249,9 +249,9 @@ Queens get_best_queen(const vector<Queens> &population)
 
 void draw_queen(const Queens &queens)
 {
-    for (unsigned i = 0; i < 8; ++i)
+    for (auto i = 0U; i < 8; ++i)
     {
-        for (unsigned j = 0; j < 8; ++j)
+        for (auto j = 0U; j < 8; ++j)
         {
             if (queens[j].to_ulong() == i)
             {
@@ -291,7 +291,7 @@ tuple<Queens, unsigned> genetic_algorithm()
     // Encontra a melhor rainha
     auto best_queen = get_best_queen(population);
 
-    unsigned generation = 0;
+    auto generation = 0U;
     while (generation < MAX_GENERATIONS && fitness(best_queen) > 0)
     {
         ++generation;
@@ -310,7 +310,7 @@ tuple<Queens, unsigned> genetic_algorithm()
             Queens child1(8), child2(8); // Cria os filhos
 
             // Crossover
-            if (urand(1, 100) <= CROSSOVER_RATE)
+            if (roll(1, 100) <= CROSSOVER_RATE)
             {
                 tie(child1, child2) = crossover(population[parent1], population[parent2]);
             }
@@ -321,11 +321,11 @@ tuple<Queens, unsigned> genetic_algorithm()
             }
 
             // Mutação
-            if (urand(1, 100) <= MUTATION_RATE)
+            if (roll(1, 100) <= MUTATION_RATE)
             {
                 mutate(child1);
             }
-            if (urand(1, 100) <= MUTATION_RATE)
+            if (roll(1, 100) <= MUTATION_RATE)
             {
                 mutate(child2);
             }
